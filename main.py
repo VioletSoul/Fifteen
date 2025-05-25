@@ -1,6 +1,6 @@
 import sys
 import random
-from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot
+from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot, QUrl
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
 
@@ -58,16 +58,16 @@ class GameModel(QObject):
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
+    app.setWindowIcon(QIcon("15.png"))
 
-    # Установка иконки приложения (файл icon.png должен быть рядом с main.py)
-    app.setWindowIcon(QIcon("icon.png"))
+    if sys.platform.startswith("win"):
+        import ctypes
+        myappid = 'GameOfFifteen'
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     engine = QQmlApplicationEngine()
+    engine.load(QUrl("main.qml"))
 
-    game_model = GameModel()
-    engine.rootContext().setContextProperty("gameModel", game_model)
-
-    engine.load("main.qml")
     if not engine.rootObjects():
         sys.exit(-1)
 
@@ -78,6 +78,8 @@ if __name__ == "__main__":
         if win_dialog:
             win_dialog.setProperty("visible", True)
 
+    game_model = GameModel()
+    engine.rootContext().setContextProperty("gameModel", game_model)
     game_model.gameWon.connect(on_game_won)
 
     sys.exit(app.exec())
