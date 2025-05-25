@@ -41,12 +41,12 @@ ApplicationWindow {
                     clip: true
 
                     gradient: Gradient {
-                        GradientStop { position: 0.0; color: gameModel.tiles[index] === 0 ? "transparent" : "#4a7c33" }
-                        GradientStop { position: 1.0; color: gameModel.tiles[index] === 0 ? "transparent" : "#2f4d1a" }
+                        GradientStop { position: 0.0; color: (gameModel && gameModel.tiles[index] === 0) ? "transparent" : "#4a7c33" }
+                        GradientStop { position: 1.0; color: (gameModel && gameModel.tiles[index] === 0) ? "transparent" : "#2f4d1a" }
                     }
 
-                    border.color: gameModel.tiles[index] === 0 ? "transparent" : "#2a3b11"
-                    border.width: gameModel.tiles[index] === 0 ? 0 : 2
+                    border.color: (gameModel && gameModel.tiles[index] === 0) ? "transparent" : "#2a3b11"
+                    border.width: (gameModel && gameModel.tiles[index] === 0) ? 0 : 2
 
                     Rectangle {
                         anchors.fill: parent
@@ -55,12 +55,12 @@ ApplicationWindow {
                         color: "transparent"
                         border.color: "white"
                         border.width: 1
-                        opacity: gameModel.tiles[index] === 0 ? 0 : 0.25
+                        opacity: (gameModel && gameModel.tiles[index] === 0) ? 0 : 0.25
                     }
 
                     Text {
                         anchors.centerIn: parent
-                        text: gameModel.tiles[index] === 0 ? "" : gameModel.tiles[index]
+                        text: (gameModel && gameModel.tiles[index] !== 0) ? gameModel.tiles[index] : ""
                         font.pixelSize: 32
                         font.bold: true
                         color: "#e0e6d4"
@@ -70,8 +70,10 @@ ApplicationWindow {
                     MouseArea {
                         anchors.fill: parent
                         hoverEnabled: true
-                        cursorShape: gameModel.tiles[index] === 0 ? Qt.ArrowCursor : Qt.PointingHandCursor
-                        onClicked: gameModel.moveTile(index)
+                        cursorShape: (gameModel && gameModel.tiles[index] === 0) ? Qt.ArrowCursor : Qt.PointingHandCursor
+                        onClicked: {
+                            if (gameModel) gameModel.moveTile(index)
+                        }
                     }
                 }
             }
@@ -83,14 +85,17 @@ ApplicationWindow {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: gameArea.bottom
         anchors.topMargin: 25
-        width: 120
+        width: 140
         height: 40
         font.pixelSize: 16
-        onClicked: gameModel.shuffle()
+        onClicked: {
+            if (gameModel) gameModel.shuffle()
+        }
     }
 
     Rectangle {
         id: modalOverlay
+        objectName: "modalOverlay"
         anchors.fill: parent
         color: "#00000080"
         visible: false
@@ -128,13 +133,6 @@ ApplicationWindow {
                     onClicked: modalOverlay.visible = false
                 }
             }
-        }
-    }
-
-    Connections {
-        target: gameModel
-        function onGameWon() {
-            modalOverlay.visible = true
         }
     }
 }

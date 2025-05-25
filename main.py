@@ -66,6 +66,10 @@ if __name__ == "__main__":
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     engine = QQmlApplicationEngine()
+
+    game_model = GameModel()
+    engine.rootContext().setContextProperty("gameModel", game_model)
+
     engine.load(QUrl("main.qml"))
 
     if not engine.rootObjects():
@@ -74,12 +78,10 @@ if __name__ == "__main__":
     root = engine.rootObjects()[0]
 
     def on_game_won():
-        win_dialog = root.findChild(QObject, "winDialog")
-        if win_dialog:
-            win_dialog.setProperty("visible", True)
+        modal_overlay = root.findChild(QObject, "modalOverlay")
+        if modal_overlay:
+            modal_overlay.setProperty("visible", True)
 
-    game_model = GameModel()
-    engine.rootContext().setContextProperty("gameModel", game_model)
     game_model.gameWon.connect(on_game_won)
 
     sys.exit(app.exec())
