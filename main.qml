@@ -110,15 +110,12 @@ ApplicationWindow {
                 anchors.fill: parent
                 anchors.margins: 20
                 spacing: 15
-                horizontalAlignment: Qt.AlignHCenter
 
                 Label {
                     text: "Вы собрали все плитки!"
                     font.pixelSize: 20
                     font.bold: true
                     color: "#e0e6d4"
-                    horizontalAlignment: Text.AlignHCenter
-                    verticalAlignment: Label.AlignVCenter
                     wrapMode: Text.WordWrap
                     Layout.fillWidth: true
                     Layout.alignment: Qt.AlignHCenter
@@ -141,4 +138,3 @@ ApplicationWindow {
         }
     }
 }
-
