@@ -38,7 +38,7 @@ class GameModel(QObject):
         row_tile, col_tile = divmod(tile_index, 4)
         row_zero, col_zero = divmod(zero_index, 4)
         return (abs(row_tile - row_zero) == 1 and col_tile == col_zero) or \
-               (abs(col_tile - col_zero) == 1 and row_tile == row_zero)
+            (abs(col_tile - col_zero) == 1 and row_tile == row_zero)
 
     def _checkWin(self):
         return self._tiles == list(range(1, 16)) + [0]
@@ -50,8 +50,8 @@ class GameModel(QObject):
             for j in range(i + 1, len(tiles)):
                 if tiles[i] > tiles[j]:
                     inv_count += 1
-        zero_row = self._tiles.index(0) // 4
-        if zero_row % 2 == 0:
+        zero_row_from_bottom = 4 - (self._tiles.index(0) // 4)
+        if zero_row_from_bottom % 2 == 0:
             return inv_count % 2 == 1
         else:
             return inv_count % 2 == 0
@@ -77,4 +77,3 @@ if __name__ == "__main__":
     game_model.gameWon.connect(on_game_won)
 
     sys.exit(app.exec())
-
