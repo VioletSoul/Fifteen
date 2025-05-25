@@ -1,7 +1,7 @@
 import sys
 import random
 from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot
-from PyQt6.QtGui import QGuiApplication
+from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
 
 class GameModel(QObject):
@@ -58,6 +58,10 @@ class GameModel(QObject):
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
+
+    # Установка иконки приложения (файл icon.png должен быть рядом с main.py)
+    app.setWindowIcon(QIcon("icon.png"))
+
     engine = QQmlApplicationEngine()
 
     game_model = GameModel()
