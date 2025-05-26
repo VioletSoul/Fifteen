@@ -6,7 +6,7 @@ ApplicationWindow {
     // Main application window
     visible: true
     width: 420
-    height: 500
+    height: 470
     title: "Fifteen Puzzle"
     minimumWidth: width
     maximumWidth: width
