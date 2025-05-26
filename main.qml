@@ -83,7 +83,7 @@ ApplicationWindow {
                         font.pixelSize: 34
                         font.bold: true
                         //color: "#e0e6d4"
-                        color: "#073502"
+                        color: "#0f2c09"
                         smooth: true
 
                         Item {
