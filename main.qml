@@ -82,7 +82,8 @@ ApplicationWindow {
                         text: (gameModel && gameModel.tiles[index] !== 0) ? gameModel.tiles[index] : ""
                         font.pixelSize: 34
                         font.bold: true
-                        color: "#e0e6d4"
+                        //color: "#e0e6d4"
+                        color: "#073502"
                         smooth: true
 
                         Item {
