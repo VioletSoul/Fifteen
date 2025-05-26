@@ -33,7 +33,7 @@ ApplicationWindow {
             columns: 4
             spacing: 8
             anchors.fill: parent
-            anchors.margins: 8
+            anchors.margins: 13
 
             Repeater {
                 // Create tiles according to gameModel.tiles
@@ -122,7 +122,7 @@ ApplicationWindow {
         text: "Shuffle"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: gameArea.bottom
-        anchors.topMargin: 25
+        anchors.topMargin: 20
         width: 140
         height: 40
         font.pixelSize: 16
