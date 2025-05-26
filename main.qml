@@ -124,8 +124,9 @@ ApplicationWindow {
         anchors.top: gameArea.bottom
         anchors.topMargin: 20
         width: 140
-        height: 40
+        height: 50
         font.pixelSize: 16
+        font.bold: true
         onClicked: {
             if (gameModel) gameModel.shuffle()
         }
@@ -138,6 +139,7 @@ ApplicationWindow {
         anchors.top: parent.children[parent.children.length - 2].bottom
         anchors.topMargin: 10
         font.pixelSize: 16
+        font.bold: true
         color: "#e0e6d4"
     }
 
