@@ -4,122 +4,136 @@ from PyQt6.QtCore import QObject, pyqtSignal, pyqtProperty, pyqtSlot, QUrl
 from PyQt6.QtGui import QGuiApplication, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine
 
-# Класс модели игры, наследуется от QObject для взаимодействия с QML
+# Game model class, inherits from QObject for QML integration
 class GameModel(QObject):
-    # Сигнал, который уведомляет QML об изменении списка плиток
+    # Signal emitted when the tiles list changes
     tilesChanged = pyqtSignal()
-    # Сигнал, который уведомляет о победе в игре
+    # Signal emitted when the game is won
     gameWon = pyqtSignal()
+    # Signal emitted when the move counter changes
+    movesChanged = pyqtSignal()
 
     def __init__(self):
         super().__init__()
-        # Инициализация списка плиток в правильном порядке: 1..15 и пустая плитка (0)
+        # Initialize tiles in correct order: 1..15 and empty tile (0)
         self._tiles = list(range(1, 16)) + [0]
-        # Перемешиваем плитки при старте
+        # Initialize move counter
+        self._moves = 0
+        # Shuffle the tiles on startup
         self.shuffle()
 
-    # Свойство tiles, доступное из QML, с уведомлением об изменениях
+    # Property exposed to QML for the tiles list, with change notification
     @pyqtProperty(list, notify=tilesChanged)
     def tiles(self):
         return self._tiles
 
-    # Слот для перемещения плитки по индексу
+    # Property for the move counter, exposed to QML
+    @pyqtProperty(int, notify=movesChanged)
+    def moves(self):
+        return self._moves
+
+    # Slot to move a tile by index
     @pyqtSlot(int)
     def moveTile(self, index):
-        # Находим индекс пустой плитки (0)
+        # Find the index of the empty tile (0)
         zero_index = self._tiles.index(0)
-        # Проверяем, можно ли переместить плитку (только если она соседняя с пустой)
+        # Check if the move is valid (tile is adjacent to empty)
         if self._canMove(index, zero_index):
-            # Меняем местами выбранную плитку и пустую
+            # Swap the selected tile with the empty tile
             self._tiles[zero_index], self._tiles[index] = self._tiles[index], self._tiles[zero_index]
-            # Уведомляем QML, что плитки изменились
+            # Increment the move counter
+            self._moves += 1
+            # Notify QML of changes
             self.tilesChanged.emit()
-            # Проверяем, собраны ли все плитки в правильном порядке
+            self.movesChanged.emit()
+            # Check if the game is won
             if self._checkWin():
-                # Если да, кидаем сигнал победы
                 self.gameWon.emit()
 
-    # Слот для перемешивания плиток
+    # Slot to shuffle the tiles
     @pyqtSlot()
     def shuffle(self):
         while True:
-            # Перемешиваем плитки случайным образом
+            # Shuffle the tiles randomly
             random.shuffle(self._tiles)
-            # Проверяем, что головоломка решаема и еще не решена
+            # Check if the puzzle is solvable and not already solved
             if self._isSolvable() and not self._checkWin():
                 break
-        # Уведомляем QML об изменении плиток после перемешивания
+        # Reset the move counter
+        self._moves = 0
+        # Notify QML of changes
         self.tilesChanged.emit()
+        self.movesChanged.emit()
 
-    # Вспомогательный метод: проверка, можно ли переместить плитку (соседство с пустой)
+    # Helper method: check if a tile can be moved (is adjacent to empty)
     def _canMove(self, tile_index, zero_index):
-        # Получаем координаты плитки и пустой клетки (row, column)
+        # Get tile and empty cell coordinates (row, column)
         row_tile, col_tile = divmod(tile_index, 4)
         row_zero, col_zero = divmod(zero_index, 4)
-        # Можно переместить, если плитка находится слева, справа, сверху или снизу от пустой
+        # Move is valid if tile is left, right, above, or below the empty cell
         return (abs(row_tile - row_zero) == 1 and col_tile == col_zero) or \
             (abs(col_tile - col_zero) == 1 and row_tile == row_zero)
 
-    # Проверка, собраны ли плитки в правильном порядке (1..15 и пустая в конце)
+    # Check if the tiles are in the correct order (1..15 and empty at the end)
     def _checkWin(self):
         return self._tiles == list(range(1, 16)) + [0]
 
-    # Проверка, решаема ли текущая конфигурация плиток
+    # Check if the current tile configuration is solvable
     def _isSolvable(self):
         inv_count = 0
-        # Список плиток без пустой
+        # List of tiles without the empty one
         tiles = [t for t in self._tiles if t != 0]
-        # Подсчёт инверсий — пар плиток, стоящих в неправильном порядке
+        # Count inversions: pairs of tiles in wrong order
         for i in range(len(tiles)):
             for j in range(i + 1, len(tiles)):
                 if tiles[i] > tiles[j]:
                     inv_count += 1
-        # Определяем строку пустой плитки с низа (для правила решаемости)
+        # Get the row of the empty tile from the bottom
         zero_row_from_bottom = 4 - (self._tiles.index(0) // 4)
-        # Правила решаемости для пятнашек
+        # Solvability rules for 15 puzzle
         if zero_row_from_bottom % 2 == 0:
             return inv_count % 2 == 1
         else:
             return inv_count % 2 == 0
 
 if __name__ == "__main__":
-    # Создаём приложение Qt GUI
+    # Create Qt GUI application
     app = QGuiApplication(sys.argv)
-    # Устанавливаем иконку окна
+    # Set window icon
     app.setWindowIcon(QIcon("15.png"))
 
-    # Специфичная настройка для Windows (идентификатор приложения)
+    # Windows-specific app ID (for taskbar icon)
     if sys.platform.startswith("win"):
         import ctypes
         myappid = 'GameOfFifteen'
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    # Создаём движок QML
+    # Create QML engine
     engine = QQmlApplicationEngine()
 
-    # Создаём экземпляр модели игры
+    # Create game model instance
     game_model = GameModel()
-    # Передаём модель в контекст QML под именем "gameModel"
+    # Expose model to QML as "gameModel"
     engine.rootContext().setContextProperty("gameModel", game_model)
 
-    # Загружаем QML интерфейс
+    # Load QML interface
     engine.load(QUrl("main.qml"))
 
-    # Если загрузка не удалась — выходим
+    # Exit if QML loading failed
     if not engine.rootObjects():
         sys.exit(-1)
 
-    # Получаем корневой объект QML (главное окно)
+    # Get root QML object (main window)
     root = engine.rootObjects()[0]
 
-    # Функция, которая вызывается при победе — показывает модальное окно
+    # Function to show win modal when game is won
     def on_game_won():
         modal_overlay = root.findChild(QObject, "modalOverlay")
         if modal_overlay:
             modal_overlay.setProperty("visible", True)
 
-    # Подключаем сигнал победы к функции отображения окна
+    # Connect win signal to modal show function
     game_model.gameWon.connect(on_game_won)
 
-    # Запускаем главный цикл приложения
+    # Start application event loop
     sys.exit(app.exec())
