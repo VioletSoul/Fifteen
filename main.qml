@@ -14,8 +14,8 @@ ApplicationWindow {
     maximumHeight: height
     color: "#2e3440" // Window background color
 
+    // Game area container for the tile grid
     Rectangle {
-        // Game area container for the tile grid
         id: gameArea
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: parent.top
@@ -27,16 +27,16 @@ ApplicationWindow {
         border.color: "#4c566a" // Border color
         border.width: 1
 
+        // 4x4 grid for the tiles
         Grid {
-            // 4x4 grid for the tiles
             id: grid
             columns: 4
             spacing: 8
             anchors.fill: parent
             anchors.margins: 13
 
+            // Create tiles according to gameModel.tiles
             Repeater {
-                // Create tiles according to gameModel.tiles
                 model: gameModel ? gameModel.tiles.length : 0
                 delegate: Rectangle {
                     // Single tile
@@ -56,8 +56,8 @@ ApplicationWindow {
                     border.color: (gameModel && gameModel.tiles[index] === 0) ? "transparent" : "#1f3310"
                     border.width: (gameModel && gameModel.tiles[index] === 0) ? 0 : 3
 
+                    // Inner highlight for the tile
                     Rectangle {
-                        // Inner highlight for the tile
                         anchors.fill: parent
                         radius: 14
                         color: "transparent"
@@ -67,8 +67,8 @@ ApplicationWindow {
                         anchors.margins: 4
                     }
 
+                    // Simple shadow under the tile for elevation effect
                     Rectangle {
-                        // Simple shadow under the tile for elevation effect
                         anchors.fill: parent
                         radius: 14
                         color: "#00000040"
@@ -76,21 +76,19 @@ ApplicationWindow {
                         z: -1
                     }
 
+                    // Tile number text
                     Text {
-                        // Tile number text
                         anchors.centerIn: parent
                         text: (gameModel && gameModel.tiles[index] !== 0) ? gameModel.tiles[index] : ""
                         font.pixelSize: 34
                         font.bold: true
-                        //color: "#e0e6d4"
                         color: "#0f2c09"
                         smooth: true
 
+                        // Text shadow effect
                         Item {
-                            // Text shadow effect
                             anchors.fill: parent
                             z: -1
-
                             Text {
                                 anchors.centerIn: parent
                                 text: (gameModel && gameModel.tiles[index] !== 0) ? gameModel.tiles[index] : ""
@@ -104,8 +102,8 @@ ApplicationWindow {
                         }
                     }
 
+                    // Tile click area
                     MouseArea {
-                        // Tile click area
                         anchors.fill: parent
                         hoverEnabled: true
                         cursorShape: (gameModel && gameModel.tiles[index] === 0) ? Qt.ArrowCursor : Qt.PointingHandCursor
@@ -118,34 +116,45 @@ ApplicationWindow {
         }
     }
 
-    Button {
-        // Shuffle button
-        text: "Shuffle"
+    // Shuffle button, move counter, and shuffle counter
+    // Placed side by side for better visibility
+    RowLayout {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: gameArea.bottom
         anchors.topMargin: 20
-        width: 140
-        height: 50
-        font.pixelSize: 16
-        font.bold: true
-        onClicked: {
-            if (gameModel) gameModel.shuffle()
+        spacing: 20
+
+        Button {
+            id: shuffleButton
+            text: "Shuffle"
+            width: 100
+            height: 40
+            font.pixelSize: 16
+            font.bold: true
+            onClicked: {
+                if (gameModel) gameModel.shuffle()
+            }
+        }
+
+        Label {
+            id: movesLabel
+            text: "Moves: " + (gameModel ? gameModel.moves : 0)
+            font.pixelSize: 16
+            font.bold: true
+            color: "#e0e6d4"
+        }
+
+        Label {
+            id: shufflesLabel
+            text: "Shuffles: " + (gameModel ? gameModel.shuffleCount : 0)
+            font.pixelSize: 16
+            font.bold: true
+            color: "#e0e6d4"
         }
     }
 
-    Label {
-        // Move counter label
-        text: "Moves: " + (gameModel ? gameModel.moves : 0)
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.top: parent.children[parent.children.length - 2].bottom
-        anchors.topMargin: 10
-        font.pixelSize: 16
-        font.bold: true
-        color: "#e0e6d4"
-    }
-
+    // Modal overlay for win notification
     Rectangle {
-        // Modal overlay for win notification
         id: modalOverlay
         objectName: "modalOverlay" // For Python to find
         anchors.fill: parent
@@ -153,8 +162,8 @@ ApplicationWindow {
         visible: false // Hidden by default
         z: 1000 // On top of everything
 
+        // Message box inside the overlay
         Rectangle {
-            // Message box inside the overlay
             id: messageBox
             width: 280
             height: 120
@@ -170,8 +179,8 @@ ApplicationWindow {
                 anchors.margins: 20
                 spacing: 15
 
+                // Congratulations message
                 Label {
-                    // Congratulations message
                     text: "You solved the puzzle!"
                     font.pixelSize: 20
                     font.bold: true
@@ -181,14 +190,62 @@ ApplicationWindow {
                     Layout.alignment: Qt.AlignHCenter
                 }
 
+                // Close button
                 Button {
-                    // Close button
                     text: "Close"
                     width: 100
                     Layout.alignment: Qt.AlignHCenter
                     onClicked: modalOverlay.visible = false
                 }
             }
+        }
+    }
+
+    // Easter egg modal overlay
+    Rectangle {
+        id: easterEggModal
+        anchors.fill: parent
+        color: "#80000000"
+        visible: false
+        z: 1001
+
+        Rectangle {
+            width: 360
+            height: 140
+            radius: 10
+            color: "#4a7c33"
+            anchors.centerIn: parent
+
+            ColumnLayout {
+                anchors.fill: parent
+                spacing: 10
+                anchors.margins: 15
+
+                Text {
+                    id: eggText
+                    Layout.fillWidth: true
+                    horizontalAlignment: Text.AlignHCenter
+                    color: "#e0e6d4"
+                    font.pixelSize: 18
+                    font.bold: true
+                    wrapMode: Text.Wrap // Enable text wrapping
+                }
+
+                Button {
+                    text: "Close"
+                    Layout.alignment: Qt.AlignHCenter
+                    onClicked: easterEggModal.visible = false
+                }
+            }
+        }
+    }
+
+    // Connection to easter egg signal from Python
+    Connections {
+        target: gameModel
+        function onEasterEggSignal(message) {
+            eggText.text = message
+            easterEggModal.visible = true
         }
     }
 }
