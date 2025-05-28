@@ -1,5 +1,12 @@
 # Fifteen
 
+![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)
+![PyQt6](https://img.shields.io/badge/PyQt6-41CD52?style=flat&logo=qt&logoColor=white)
+![QML](https://img.shields.io/badge/QML-41CD52?style=flat&logo=qt&logoColor=white)
+![Cross-Platform](https://img.shields.io/badge/Cross--Platform-✓-blueviolet)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Modern UI](https://img.shields.io/badge/Modern%20UI-✓-orange)
+
 A classic "Game of Fifteen" (15 puzzle) implemented with PyQt6 and QML.
 
 ## Features
