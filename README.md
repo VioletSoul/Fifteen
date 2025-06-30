@@ -5,6 +5,8 @@
 ![QML](https://img.shields.io/badge/QML-41CD52?style=flat&logo=qt&logoColor=white)
 ![Cross-Platform](https://img.shields.io/badge/Cross--Platform-✓-blueviolet)
 ![License](https://img.shields.io/badge/License-MIT-blue)
+![Repo Size](https://img.shields.io/github/repo-size/VioletSoul/Fifteen)
+![Code Size](https://img.shields.io/github/languages/code-size/VioletSoul/Fifteen)
 ![Modern UI](https://img.shields.io/badge/Modern%20UI-✓-orange)
 [![Stars](https://img.shields.io/github/stars/VioletSoul/Fifteen.svg?style=social)](https://github.com/VioletSoul/Fifteen)
 [![Last Commit](https://img.shields.io/github/last-commit/VioletSoul/Fifteen.svg)](https://github.com/VioletSoul/Fifteen/commits/main)
